@@ -5,9 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 export default function Signup() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', department: '', year: '', batch: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', department: '', year: '', batch: '', section: '', insta_link: '', github_link: '' });
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -21,9 +21,8 @@ export default function Signup() {
     try {
       const res = await api.post('signup.php', { ...formData, year: parseInt(formData.year) || null });
       if (res.data.status === 'success') {
-        login(res.data.data.user, res.data.data.token);
-        addToast('Account created securely! Welcome aboard 🚀', 'success');
-        navigate('/feed');
+        addToast('Account created securely! Please log in. 🚀', 'success');
+        navigate('/login');
       } else {
         addToast(res.data.message || 'Signup failed', 'error');
       }
@@ -68,9 +67,24 @@ export default function Signup() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Year</label>
                 <input type="number" name="year" className="input-field" placeholder="1" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
               </div>
-              <div style={{ width: '120px' }}>
+              <div style={{ width: '100px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Batch</label>
                 <input type="text" name="batch" className="input-field" placeholder="2028" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+              </div>
+              <div style={{ width: '100px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Section</label>
+                <input type="text" name="section" className="input-field" placeholder="A" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Instagram (Optional)</label>
+                <input type="text" name="insta_link" className="input-field" placeholder="username" onChange={handleChange} disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>GitHub (Optional)</label>
+                <input type="text" name="github_link" className="input-field" placeholder="username" onChange={handleChange} disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
               </div>
             </div>
             

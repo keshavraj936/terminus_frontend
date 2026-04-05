@@ -8,6 +8,11 @@ export interface User {
   department: string;
   year: number;
   batch: string;
+  section: string;
+  role: 'student' | 'admin';
+  about_me?: string | null;
+  insta_link?: string | null;
+  github_link?: string | null;
   avatar_url?: string | null;
 }
 

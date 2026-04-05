@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import AnimatedPage from '../components/AnimatedPage';
+import TiltCard from '../components/TiltCard';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -34,28 +36,30 @@ export default function Login() {
   };
 
   return (
-    <div className="noise-bg auth-container" style={{ display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
+    <AnimatedPage>
+      <div className="noise-bg auth-container" style={{ display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
       {/* Left split - Image */}
       <div className="animate-fade-up auth-hero" style={{ flex: 1.2, position: 'relative', display: 'flex', flexDirection: 'column', padding: '4rem', color: 'white' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'url(/hero-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0 }}></div>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.95))', zIndex: 1 }}></div>
         
         <div style={{ zIndex: 2, position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white' }}>CC</span>
+          <div style={{ width: '80px', height: '80px', marginBottom: '2rem' }}>
+            <img src="/logo.png" alt="Terminus Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', boxShadow: '0 0 20px rgba(100, 200, 255, 0.2)' }} />
           </div>
           <h1 className="animate-slide-in delay-100" style={{ fontSize: '3.5rem', fontWeight: 800, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-1px' }}>
-            Where Campus <br/> Meets the Future.
+            Where Terminus <br/> Meets the Future.
           </h1>
           <p className="animate-slide-in delay-200" style={{ fontSize: '1.25rem', opacity: 0.9, maxWidth: '500px', lineHeight: 1.6 }}>
-            Join the most vibrant university network. Connect with peers, share ideas, and elevate your academic journey.
+            Join Terminus, the most vibrant university network. Connect with peers, share ideas, and elevate your academic journey.
           </p>
         </div>
       </div>
       
       {/* Right split - Form */}
-      <div className="animate-slide-in delay-300" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--surface)', boxShadow: '-10px 0 30px rgba(0,0,0,0.05)', position: 'relative', zIndex: 10 }}>
-        <div style={{ width: '100%', maxWidth: '380px' }}>
+      <div className="animate-slide-in delay-300" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--surface)', position: 'relative', zIndex: 10 }}>
+        <TiltCard maxTilt={5} scaleOnHover={1.01} style={{ width: '100%', maxWidth: '380px' }}>
+          <div style={{ transform: 'translateZ(30px)' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Welcome back</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '1.05rem' }}>Enter your details to access your account.</p>
           
@@ -81,8 +85,10 @@ export default function Login() {
           <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.95rem', color: 'var(--text-muted)' }}>
             Don't have an account? <Link to="/signup" style={{ color: 'var(--text-main)', fontWeight: 800 }}>Create one now</Link>
           </div>
-        </div>
+          </div>
+        </TiltCard>
       </div>
     </div>
+    </AnimatedPage>
   );
 }

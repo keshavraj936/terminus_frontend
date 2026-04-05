@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import AnimatedPage from '../components/AnimatedPage';
+import { Heart, MessageSquare, Share2, Image as ImageIcon, Code, Calendar } from 'lucide-react';
 
 interface Post {
   id: number;
@@ -37,6 +39,7 @@ export default function Feed() {
   const [expandedComments, setExpandedComments] = useState<Record<number, boolean>>({});
   const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
   const [newCommentText, setNewCommentText] = useState<Record<number, string>>({});
+  const [showNewPostModal, setShowNewPostModal] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -55,8 +58,8 @@ export default function Feed() {
     fetchPosts();
   }, []);
 
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreatePost = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!newPost.trim() && !mediaFile) return;
     
     setLoading(true);
@@ -75,6 +78,7 @@ export default function Feed() {
       if (res.data.status === 'success') {
         setNewPost('');
         setMediaFile(null);
+        setShowNewPostModal(false);
         fetchPosts();
       }
     } catch (err) {
@@ -149,52 +153,111 @@ export default function Feed() {
 
   const renderAvatar = (url: string | null, name: string) => {
     if (url) {
-      return <img src={`http://${window.location.hostname}:8000${url}`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
+      return <img src={`${import.meta.env.VITE_API_URL}${url}`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />;
     }
     return name.charAt(0).toUpperCase();
   };
 
   return (
-    <div className="animate-fade-up container" style={{ maxWidth: '1200px' }}>
-      <div className="glass-panel" style={{ borderRadius: '24px', padding: '3rem 2.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow)' }}>
-        <div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.25rem', letterSpacing: '-0.5px' }}>
-            Welcome back, <span className="hero-gradient-text">{user?.name}</span> 👋
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Ready to conquer today? Here's what's happening on campus.</p>
-        </div>
-        <button className="btn hoverable" onClick={fetchPosts} style={{ borderRadius: '12px', width: '56px', height: '56px', padding: 0, fontSize: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>↻</button>
-      </div>
+    <AnimatedPage>
+    {/* Hidden trigger that sidebar 'New Post' button clicks */}
+    <button id="global-new-post" style={{ display: 'none' }} onClick={() => setShowNewPostModal(true)} />
 
+    {/* New Post Modal */}
+    {showNewPostModal && (
+      <div
+        onClick={() => setShowNewPostModal(false)}
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: '1rem'
+        }}
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          className="card animate-fade-up"
+          style={{ width: '100%', maxWidth: '560px', borderRadius: '8px', padding: '2rem' }}
+        >
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-main)' }}>New Post</h3>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+            <div className="avatar" style={{ width: '40px', height: '40px', fontSize: '1rem', overflow: 'hidden', flexShrink: 0 }}>
+              {renderAvatar(user?.avatar_url || null, user?.name || 'U')}
+            </div>
+            <div style={{ flex: 1 }}>
+              <textarea
+                autoFocus
+                placeholder="What's on your mind?"
+                value={newPost}
+                onChange={e => setNewPost(e.target.value)}
+                style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.05rem', outline: 'none', resize: 'none', minHeight: '120px', lineHeight: 1.6 }}
+              />
+            </div>
+          </div>
+
+          {mediaFile && (
+            <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--primary)', background: 'rgba(184,205,239,0.1)', padding: '0.4rem 0.8rem', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              {mediaFile.name} <span style={{ cursor: 'pointer' }} onClick={() => setMediaFile(null)}>✖</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)' }}>
+              <span style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }} onClick={() => fileInputRef.current?.click()}>
+                <ImageIcon size={15} /> MEDIA
+              </span>
+              <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={e => e.target.files && setMediaFile(e.target.files[0])} />
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button onClick={() => setShowNewPostModal(false)} style={{ padding: '0.5rem 1rem', borderRadius: '4px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => handleCreatePost()} className="btn" disabled={(!newPost.trim() && !mediaFile) || loading} style={{ padding: '0.5rem 1.25rem', borderRadius: '4px' }}>Post Spark</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    <div className="animate-fade-up container" style={{ paddingTop: '2rem' }}>
       <div className="feed-grid">
         <div>
-          <div className="card animate-fade-up delay-100" style={{ marginBottom: '2rem', padding: '1.5rem 1.5rem 1rem 1.5rem', borderRadius: '20px' }}>
+          <div className="animate-fade-up delay-100" style={{ marginBottom: '2rem' }}>
+            <div className="card" style={{ padding: '1.5rem', borderRadius: '8px' }}>
             <form onSubmit={handleCreatePost} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
               <div className="avatar" style={{ width: '48px', height: '48px', fontSize: '1.2rem', overflow: 'hidden' }}>
                 {renderAvatar(user?.avatar_url || null, user?.name || 'U')}
               </div>
               <div style={{ flex: 1, position: 'relative' }}>
-                <textarea 
-                  className="input-field" 
-                  placeholder="Share a campus update, ask a question, or use #hashtags and @mentions..." 
+                <input 
+                  placeholder="Ignite a conversation..." 
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
-                  style={{ minHeight: '90px', resize: 'none', padding: '1rem', backgroundColor: 'var(--bg-color)', fontSize: '1.05rem', borderRadius: '16px' }}
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.1rem', outline: 'none', marginTop: '0.6rem' }}
                 />
-                {mediaFile && (
-                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--primary)', background: 'rgba(56, 189, 248, 0.1)', padding: '0.5rem 1rem', borderRadius: '8px', display: 'inline-block' }}>
-                    📎 {mediaFile.name} <span style={{cursor: 'pointer', marginLeft: '0.5rem'}} onClick={() => setMediaFile(null)}>✖</span>
-                  </div>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                  <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)', fontSize: '1.25rem', marginLeft: '0.5rem' }}>
-                    <span style={{ cursor: 'pointer', transition: 'var(--transition)' }} className="hoverable" onClick={() => fileInputRef.current?.click()}>📎 Photo/Doc</span>
-                    <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={(e) => e.target.files && setMediaFile(e.target.files[0])} />
-                  </div>
-                  <button type="submit" className="btn hoverable" disabled={(!newPost.trim() && !mediaFile) || loading} style={{ padding: '0.6rem 2rem', borderRadius: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>Post Spark</button>
-                </div>
               </div>
             </form>
+            
+            {mediaFile && (
+              <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--primary)', background: 'rgba(184, 205, 239, 0.1)', padding: '0.5rem 1rem', borderRadius: '4px', display: 'inline-block' }}>
+                📎 {mediaFile.name} <span style={{cursor: 'pointer', marginLeft: '0.5rem'}} onClick={() => setMediaFile(null)}>✖</span>
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
+              <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-muted)' }}>
+                <span style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }} className="hoverable" onClick={() => fileInputRef.current?.click()}>
+                  <ImageIcon size={16} /> MEDIA
+                </span>
+                <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={(e) => e.target.files && setMediaFile(e.target.files[0])} />
+                <span style={{ cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', opacity: 0.5 }}>
+                  <Code size={16} /> SNIPPET
+                </span>
+                <span style={{ cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', opacity: 0.5 }}>
+                  <Calendar size={16} /> EVENT
+                </span>
+              </div>
+              <button onClick={handleCreatePost} className="btn hoverable" disabled={(!newPost.trim() && !mediaFile) || loading} style={{ padding: '0.5rem 1.25rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'var(--text-main)' }}>Post Spark</button>
+            </div>
+            
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -216,40 +279,45 @@ export default function Feed() {
               <div className="card" style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>It's quiet here. Break the ice!</div>
             ) : (
               posts.map((post, index) => (
-                <div key={post.id} className={`card hoverable animate-fade-up`} style={{ animationDelay: `${(index % 3) * 100}ms`, borderRadius: '20px' }}>
-                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-                    <Link to={`/profile/${post.user_id}`} style={{ textDecoration: 'none' }}>
-                      <div className="avatar" style={{ width: '50px', height: '50px', fontSize: '1.2rem', overflow: 'hidden' }}>
-                        {renderAvatar(post.avatar_url, post.name)}
-                      </div>
-                    </Link>
-                    <div>
+                <div key={post.id} className={`card hoverable animate-fade-up`} style={{ animationDelay: `${(index % 3) * 100}ms` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
                       <Link to={`/profile/${post.user_id}`} style={{ textDecoration: 'none' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, letterSpacing: '-0.25px', color: 'var(--text-main)' }}>{post.name}</h3>
+                        <div className="avatar" style={{ width: '40px', height: '40px', fontSize: '1rem', overflow: 'hidden' }}>
+                          {renderAvatar(post.avatar_url, post.name)}
+                        </div>
                       </Link>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{post.department} • {new Date(post.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                      <div>
+                        <Link to={`/profile/${post.user_id}`} style={{ textDecoration: 'none' }}>
+                          <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>{post.name}</h3>
+                        </Link>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{post.department} • {new Date(post.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</p>
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)', fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '12px', fontWeight: 600, letterSpacing: '0.5px' }}>
+                      UPDATE
                     </div>
                   </div>
                   
-                  <p style={{ fontSize: '1.05rem', lineHeight: 1.6, color: 'var(--text-main)', marginBottom: '1rem', whiteSpace: 'pre-wrap' }}>
+                  <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--text-main)', marginBottom: '1rem', whiteSpace: 'pre-wrap' }}>
                     {parseContent(post.content)}
                   </p>
 
                   {post.media_url && (
-                    <div style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
-                      <img src={`http://${window.location.hostname}:8000${post.media_url}`} alt="Post Attachment" style={{ width: '100%', display: 'block' }} />
+                    <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                      <img src={`${import.meta.env.VITE_API_URL}${post.media_url}`} alt="Post Attachment" style={{ width: '100%', display: 'block' }} />
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem', marginTop: '1rem' }}>
-                    <button onClick={() => handleLike(post.id)} className="btn-secondary animate-pop hoverable" style={{ border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', color: post.has_liked ? '#ef4444' : 'var(--text-muted)', fontWeight: 600, padding: '0.6rem 1.25rem', borderRadius: '12px', background: post.has_liked ? 'rgba(239, 68, 68, 0.1)' : 'var(--bg-color)', transition: '0.2s' }}>
-                      <span style={{ fontSize: '1.1rem' }}>{post.has_liked ? '❤️' : '🤍'}</span> {post.likes_count}
+                  <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
+                    <button onClick={() => handleLike(post.id)} className="hoverable" style={{ border: 'none', background: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', color: post.has_liked ? '#ef4444' : 'var(--text-muted)', fontWeight: 600, transition: '0.2s', fontSize: '0.85rem' }}>
+                      <Heart size={18} fill={post.has_liked ? '#ef4444' : 'none'} color={post.has_liked ? '#ef4444' : 'currentColor'} /> {post.likes_count}
                     </button>
-                    <button onClick={() => toggleComments(post.id)} className="btn-secondary hoverable" style={{ border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontWeight: 600, padding: '0.6rem 1.25rem', borderRadius: '12px', background: 'var(--bg-color)', transition: '0.2s' }}>
-                      <span style={{ fontSize: '1.1rem' }}>💬</span> {post.comments_count}
+                    <button onClick={() => toggleComments(post.id)} className="hoverable" style={{ border: 'none', background: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontWeight: 600, transition: '0.2s', fontSize: '0.85rem' }}>
+                      <MessageSquare size={18} /> {post.comments_count}
                     </button>
-                    <button className="btn-secondary hoverable" style={{ border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontWeight: 600, padding: '0.6rem 1.25rem', borderRadius: '12px', background: 'var(--bg-color)' }}>
-                      <span style={{ fontSize: '1.1rem' }}>📤</span> Share
+                    <button className="hoverable" style={{ border: 'none', background: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.85rem' }}>
+                      <Share2 size={18} /> {Math.floor(Math.random() * 20)}
                     </button>
                   </div>
 
@@ -289,29 +357,8 @@ export default function Feed() {
             )}
           </div>
         </div>
-
-        {/* Sidebar Trending section preserved but moved mostly as is */}
-        <div className="animate-fade-up delay-200 trending-sidebar">
-           <div className="card hoverable" style={{ position: 'sticky', top: '2rem', padding: '2rem', borderRadius: '24px' }}>
-              <div style={{ width: '56px', height: '56px', background: 'var(--text-main)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', marginBottom: '1.5rem', boxShadow: 'var(--shadow)' }}>
-                🚀
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Trending Topics</h3>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>What students are talking about right now.</p>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: '12px', cursor: 'pointer', transition: 'var(--transition)' }} className="hoverable">
-                  <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.95rem' }}>#TechFest2026</span>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>4.2k Sparks</div>
-                </div>
-                <div style={{ padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: '12px', cursor: 'pointer', transition: 'var(--transition)' }} className="hoverable">
-                  <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.95rem' }}>#Midterms</span>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>2.1k Sparks</div>
-                </div>
-              </div>
-           </div>
-        </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 }

@@ -35,7 +35,8 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         // Attempt to seamlessly refresh using our invisible HttpOnly cookie
-        const res = await axios.post(`${API_URL}refresh.php`, {}, { withCredentials: true });
+        const refreshUrl = `${API_URL.replace(/\/$/, '')}/refresh.php`;
+        const res = await axios.post(refreshUrl, {}, { withCredentials: true });
         if (res.data.status === 'success') {
           // Hydrate the memory
           setAccessToken(res.data.data.token);

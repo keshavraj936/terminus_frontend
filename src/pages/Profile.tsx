@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth, type User } from '../context/AuthContext';
+import AnimatedPage from '../components/AnimatedPage';
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +12,8 @@ export default function Profile() {
   const [stats, setStats] = useState({ followers_count: 0, following_count: 0, is_following: false });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ about_me: '', insta_link: '', github_link: '' });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,7 +24,9 @@ export default function Profile() {
 
       const res = await api.get(`profile.php${id ? `?user_id=${id}` : ''}`);
       if (res.data.status === 'success') {
-        setProfile(res.data.data);
+        const u = res.data.data;
+        setProfile(u);
+        setEditData({ about_me: u.about_me || '', insta_link: u.insta_link || '', github_link: u.github_link || '' });
       } else {
         setError(res.data.message || 'Failed to load profile');
       }
@@ -61,6 +66,18 @@ export default function Profile() {
     }
   };
 
+  const handleSaveProfile = async () => {
+    try {
+      const res = await api.post('profile.php', { action: 'update_info', ...editData });
+      if (res.data.status === 'success') {
+        setProfile((prev) => prev ? { ...prev, ...editData } : null);
+        setIsEditing(false);
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
   const handleFollowToggle = async () => {
     if (!profile) return;
     try {
@@ -79,10 +96,10 @@ export default function Profile() {
 
   if (loading) return (
     <div className="animate-fade-up" style={{ maxWidth: '850px', margin: '0 auto', paddingBottom: '4rem' }}>
-      <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '32px', border: 'none', boxShadow: 'var(--shadow-hover)' }}>
-        <div className="skeleton" style={{ height: '280px', borderRadius: 0, width: '100%' }}></div>
-        <div style={{ padding: '0 3rem 4rem 3rem', textAlign: 'center', marginTop: '-80px' }}>
-          <div className="skeleton" style={{ width: '160px', height: '160px', margin: '0 auto', border: '8px solid var(--surface)', borderRadius: '50%' }}></div>
+      <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '8px', border: '1px solid var(--border)' }}>
+        <div className="skeleton" style={{ height: '200px', borderRadius: 0, width: '100%' }}></div>
+        <div style={{ padding: '0 3rem 4rem 3rem', textAlign: 'center', marginTop: '-60px' }}>
+          <div className="skeleton" style={{ width: '120px', height: '120px', margin: '0 auto', border: '4px solid var(--surface)', borderRadius: '50%' }}></div>
           <div className="skeleton" style={{ width: '250px', height: '36px', margin: '1.5rem auto 0.5rem auto' }}></div>
           <div className="skeleton" style={{ width: '180px', height: '20px', margin: '0 auto' }}></div>
           <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', margin: '2.5rem 0', padding: '2rem 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
@@ -90,7 +107,6 @@ export default function Profile() {
             <div className="skeleton" style={{ width: '90px', height: '50px' }}></div>
             <div className="skeleton" style={{ width: '90px', height: '50px' }}></div>
           </div>
-          <div className="skeleton" style={{ width: '100%', height: '100px', maxWidth: '650px', margin: '0 auto' }}></div>
         </div>
       </div>
     </div>
@@ -102,24 +118,25 @@ export default function Profile() {
   const isOwnProfile = !id || Number(id) === currentUser?.id;
 
   return (
+    <AnimatedPage>
     <div className="animate-fade-up" style={{ maxWidth: '850px', margin: '0 auto', paddingBottom: '4rem' }}>
-      <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '32px', border: 'none', boxShadow: 'var(--shadow-hover)' }}>
+      <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '8px', border: '1px solid var(--border)' }}>
         
         {/* Banner */}
-        <div className="profile-banner" style={{ height: '280px', background: 'var(--text-main)', position: 'relative' }}>
+        <div className="profile-banner" style={{ height: '200px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', position: 'relative' }}>
           {isOwnProfile && (
-            <div className="hoverable" style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', color: 'white', padding: '0.6rem 1.5rem', borderRadius: '24px', fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.3)' }}>
+            <div className="hoverable" style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'var(--bg-color)', color: 'var(--text-main)', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', border: '1px solid var(--border)', fontSize: '0.85rem' }}>
               Edit Banner
             </div>
           )}
         </div>
 
         {/* Profile Info */}
-        <div className="profile-avatar-container" style={{ padding: '0 3rem 4rem 3rem', position: 'relative', textAlign: 'center', marginTop: '-80px' }}>
+        <div className="profile-avatar-container" style={{ padding: '0 3rem 4rem 3rem', position: 'relative', textAlign: 'center', marginTop: '-60px' }}>
           
-          <div className="avatar profile-avatar" style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto', fontSize: '4rem', border: '8px solid var(--surface)', boxShadow: '0 8px 30px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
+          <div className="avatar profile-avatar" style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto', fontSize: '3rem', border: '4px solid var(--surface)', overflow: 'hidden' }}>
             {profile.avatar_url ? (
-              <img src={`http://${window.location.hostname}:8000${profile.avatar_url}`} alt="avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+              <img src={`${import.meta.env.VITE_API_URL}${profile.avatar_url}`} alt="avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
             ) : (
               profile.name.charAt(0).toUpperCase()
             )}
@@ -139,17 +156,17 @@ export default function Profile() {
           <p className="animate-slide-in delay-200" style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginTop: '0.5rem', fontWeight: 500 }}>{profile.department} Maven • Year {profile.year}</p>
           
           <div className="animate-fade-up delay-300 profile-stats" style={{ display: 'flex', gap: '3rem', justifyContent: 'center', margin: '2.5rem 0', padding: '2rem 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-            <div>
+            <div className="stat-box">
               <strong style={{ fontSize: '1.75rem', color: 'var(--text-main)', display: 'block', fontWeight: 800 }}>Batch {profile.batch}</strong>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '0.5rem', display: 'block' }}>Class Base</span>
             </div>
-            <div style={{ width: '1px', background: 'var(--border)' }}></div>
-            <div>
+            <div className="stat-divider" style={{ width: '1px', background: 'var(--border)' }}></div>
+            <div className="stat-box">
               <strong style={{ fontSize: '1.75rem', color: 'var(--text-main)', display: 'block', fontWeight: 800 }}>{stats.followers_count}</strong>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '0.5rem', display: 'block' }}>Followers</span>
             </div>
-            <div style={{ width: '1px', background: 'var(--border)' }}></div>
-            <div>
+            <div className="stat-divider" style={{ width: '1px', background: 'var(--border)' }}></div>
+            <div className="stat-box">
               <strong style={{ fontSize: '1.75rem', color: 'var(--text-main)', display: 'block', fontWeight: 800 }}>{stats.following_count}</strong>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '0.5rem', display: 'block' }}>Following</span>
             </div>
@@ -157,23 +174,53 @@ export default function Profile() {
           
           <div className="animate-fade-up delay-300" style={{ maxWidth: '650px', margin: '0 auto', textAlign: 'center' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--text-main)' }}>About Me</h2>
-            <p style={{ fontSize: '1.15rem', color: 'var(--text-muted)', lineHeight: 1.8 }}>
-              Passionate <strong>{profile.department}</strong> student enthusiastically building the future. I love connecting with ambitious minds and discussing deep tech, design, and innovation. Always open to collaborate on projects or chat over a virtual coffee!
-            </p>
+            {isEditing ? (
+              <textarea 
+                value={editData.about_me} 
+                onChange={(e) => setEditData({...editData, about_me: e.target.value})}
+                className="input-field" 
+                style={{ width: '100%', minHeight: '120px', background: 'var(--bg-color)', color: 'var(--text-main)', border: '1px solid var(--border)' }} 
+                placeholder="Write something about yourself..."
+              />
+            ) : (
+              <p style={{ fontSize: '1.15rem', color: 'var(--text-muted)', lineHeight: 1.8 }}>
+                {profile.about_me ? profile.about_me : `Passionate ${profile.department} student enthusiastically building the future.`}
+              </p>
+            )}
+
+            {isEditing ? (
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center' }}>
+                <input type="text" value={editData.insta_link} onChange={e => setEditData({...editData, insta_link: e.target.value})} placeholder="Instagram URL/Username" className="input-field" style={{ background: 'var(--bg-color)', border: '1px solid var(--border)' }} />
+                <input type="text" value={editData.github_link} onChange={e => setEditData({...editData, github_link: e.target.value})} placeholder="GitHub URL/Username" className="input-field" style={{ background: 'var(--bg-color)', border: '1px solid var(--border)' }} />
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {profile.email && <a href={`mailto:${profile.email}`} className="badge" style={{ padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', color: 'var(--text-main)', background: 'var(--surface)', border: '1px solid var(--border)', textDecoration: 'none' }}>Email</a>}
+                {profile.insta_link && <a href={profile.insta_link.includes('http') ? profile.insta_link : `https://instagram.com/${profile.insta_link}`} target="_blank" rel="noopener noreferrer" className="badge" style={{ padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', color: 'var(--text-main)', background: 'var(--surface)', border: '1px solid var(--border)', textDecoration: 'none' }}>Instagram</a>}
+                {profile.github_link && <a href={profile.github_link.includes('http') ? profile.github_link : `https://github.com/${profile.github_link}`} target="_blank" rel="noopener noreferrer" className="badge" style={{ padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', color: 'var(--text-main)', background: 'var(--surface)', border: '1px solid var(--border)', textDecoration: 'none' }}>GitHub</a>}
+              </div>
+            )}
           </div>
 
-          <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '3.5rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '3rem' }}>
             {isOwnProfile ? (
-               <button className="btn" onClick={() => fileInputRef.current?.click()} style={{ padding: '1rem 3rem', borderRadius: '32px', fontSize: '1.1rem', boxShadow: '0 8px 25px rgba(0,0,0,0.15)', alignSelf: 'center' }}>Update Avatar</button>
+               <>
+                 {isEditing ? (
+                   <button className="btn" onClick={handleSaveProfile}>Save Profile</button>
+                 ) : (
+                   <button className="btn" onClick={() => setIsEditing(true)}>Edit Profile</button>
+                 )}
+               </>
             ) : (
-               <button className="btn" onClick={handleFollowToggle} style={{ padding: '1rem 3rem', borderRadius: '32px', fontSize: '1.1rem', boxShadow: '0 8px 25px rgba(0,0,0,0.15)', alignSelf: 'center', background: stats.is_following ? 'var(--surface)' : 'var(--primary)', color: stats.is_following ? 'var(--primary)' : 'white' }}>
+               <button className="btn" onClick={handleFollowToggle} style={{ background: stats.is_following ? 'transparent' : 'var(--primary)', color: stats.is_following ? 'var(--text-main)' : '#111', border: stats.is_following ? '1px solid var(--border)' : 'none' }}>
                  {stats.is_following ? 'Following' : 'Follow User'}
                </button>
             )}
-            <button className="btn-secondary hoverable" style={{ padding: '1rem 3rem', borderRadius: '32px', fontSize: '1.1rem', border: '2px solid var(--border)' }}>Share Link</button>
+            <button className="btn btn-secondary">Share Link</button>
           </div>
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 }
