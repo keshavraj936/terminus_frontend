@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import AnimatedPage from '../components/AnimatedPage';
-import { UtensilsCrossed } from 'lucide-react';
+
 
 interface MenuItem {
   day: string;

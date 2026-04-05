@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layers, Users, UtensilsCrossed, User, Bell, LogOut, FilePlus2 } from 'lucide-react';
+import { Layers, Users, UtensilsCrossed, User, Bell, LogOut } from 'lucide-react';
 import api from '../services/api';
 
 interface Notification {
