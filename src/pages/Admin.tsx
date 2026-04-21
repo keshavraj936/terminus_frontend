@@ -406,7 +406,10 @@ function MessTab({ showToast }: { showToast: (m: string, t: 'success' | 'error')
         const r2 = await adminApi.get('', { params: { action: 'mess' } });
         if (r2.data.status === 'success') setMenu(r2.data.data);
       } else { showToast(r.data.message, 'error'); }
-    } catch { showToast('Invalid JSON syntax', 'error'); }
+    } catch (err: any) { 
+      console.error(err);
+      showToast(err.response?.data?.message || err.message || 'Upload failed', 'error'); 
+    }
     finally { setUploading(false); }
   };
 
