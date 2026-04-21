@@ -3,7 +3,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import AnimatedPage from '../components/AnimatedPage';
-import { Heart, MessageSquare, Share2, Image as ImageIcon, Code, Calendar } from 'lucide-react';
+import { Heart, MessageSquare, Image as ImageIcon, Code, Calendar } from 'lucide-react';
 
 interface Post {
   id: number;
