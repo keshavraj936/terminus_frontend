@@ -29,6 +29,9 @@ export default function Mess() {
   menu.forEach(item => {
     if (!grouped[item.day]) grouped[item.day] = {};
     grouped[item.day][item.meal_type] = item.items;
+    if (item.date) {
+      grouped[item.day].date = item.date;
+    }
   });
 
   const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

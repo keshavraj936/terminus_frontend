@@ -422,6 +422,9 @@ function MessTab({ showToast }: { showToast: (m: string, t: 'success' | 'error')
     menu.forEach(item => {
       if (!grouped[item.day]) grouped[item.day] = {};
       grouped[item.day][item.meal_type] = item.items;
+      if ((item as any).date) {
+        grouped[item.day].date = (item as any).date;
+      }
     });
   }
 
