@@ -325,9 +325,6 @@ export default function Feed() {
                     <button onClick={() => toggleComments(post.id)} className="hoverable" style={{ border: 'none', background: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontWeight: 600, transition: '0.2s', fontSize: '0.85rem' }}>
                       <MessageSquare size={18} /> {post.comments_count}
                     </button>
-                    <button className="hoverable" style={{ border: 'none', background: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.85rem' }}>
-                      <Share2 size={18} /> {Math.floor(Math.random() * 20)}
-                    </button>
                   </div>
 
                   {/* Comments Section */}
