@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import AnimatedPage from '../components/AnimatedPage';
-import { Heart, MessageSquare, Image as ImageIcon, Code, Calendar } from 'lucide-react';
+import { Heart, MessageSquare } from 'lucide-react';
 
 interface Post {
   id: number;
@@ -35,7 +35,7 @@ export default function Feed() {
   const [newPost, setNewPost] = useState('');
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const [expandedComments, setExpandedComments] = useState<Record<number, boolean>>({});
   const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
@@ -210,12 +210,7 @@ export default function Feed() {
           )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-            <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)' }}>
-              <span style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }} onClick={() => fileInputRef.current?.click()}>
-                <ImageIcon size={15} /> MEDIA
-              </span>
-              <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={e => e.target.files && setMediaFile(e.target.files[0])} />
-            </div>
+            <div></div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button onClick={() => setShowNewPostModal(false)} style={{ padding: '0.5rem 1rem', borderRadius: '4px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
               <button onClick={() => handleCreatePost()} className="btn" disabled={(!newPost.trim() && !mediaFile) || loading} style={{ padding: '0.5rem 1.25rem', borderRadius: '4px' }}>Post Spark</button>
@@ -251,18 +246,7 @@ export default function Feed() {
             )}
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
-              <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-muted)' }}>
-                <span style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }} className="hoverable" onClick={() => fileInputRef.current?.click()}>
-                  <ImageIcon size={16} /> MEDIA
-                </span>
-                <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={(e) => e.target.files && setMediaFile(e.target.files[0])} />
-                <span style={{ cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', opacity: 0.5 }}>
-                  <Code size={16} /> SNIPPET
-                </span>
-                <span style={{ cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', opacity: 0.5 }}>
-                  <Calendar size={16} /> EVENT
-                </span>
-              </div>
+              <div></div>
               <button onClick={handleCreatePost} className="btn hoverable" disabled={(!newPost.trim() && !mediaFile) || loading} style={{ padding: '0.5rem 1.25rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'var(--text-main)' }}>Post Spark</button>
             </div>
             
