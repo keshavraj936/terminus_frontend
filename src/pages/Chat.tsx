@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import AnimatedPage from '../components/AnimatedPage';
-import { Send, User as UserIcon, MessageSquare } from 'lucide-react';
+import { Send, MessageSquare } from 'lucide-react';
 
 interface Contact {
   id: number;
