@@ -7,6 +7,7 @@ interface MenuItem {
   day: string;
   meal_type: string;
   items: string;
+  date?: string;
 }
 
 export default function Mess() {
