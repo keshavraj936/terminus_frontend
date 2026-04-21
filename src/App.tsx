@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import Community from './pages/Community';
 import Mess from './pages/Mess';
 import Admin from './pages/Admin';
+import Chat from './pages/Chat';
 import { AnimatePresence } from 'framer-motion';
 import './index.css';
 
@@ -42,6 +43,7 @@ const AppContent = () => {
             <Route path="/mess" element={<ProtectedRoute><Mess /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
 
             {/* Admin — completely independent, no user auth needed */}
             <Route path="/develop" element={<Admin />} />

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth, type User } from '../context/AuthContext';
 import AnimatedPage from '../components/AnimatedPage';
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   
   const [profile, setProfile] = useState<User | null>(null);
@@ -212,9 +213,14 @@ export default function Profile() {
                  )}
                </>
             ) : (
-               <button className="btn" onClick={handleFollowToggle} style={{ background: stats.is_following ? 'transparent' : 'var(--primary)', color: stats.is_following ? 'var(--text-main)' : '#111', border: stats.is_following ? '1px solid var(--border)' : 'none' }}>
-                 {stats.is_following ? 'Following' : 'Follow User'}
-               </button>
+               <>
+                 <button className="btn" onClick={handleFollowToggle} style={{ background: stats.is_following ? 'transparent' : 'var(--primary)', color: stats.is_following ? 'var(--text-main)' : '#111', border: stats.is_following ? '1px solid var(--border)' : 'none' }}>
+                   {stats.is_following ? 'Following' : 'Follow User'}
+                 </button>
+                 <button className="btn btn-secondary" onClick={() => navigate(`/chat?user_id=${profile.id}`)}>
+                   Message
+                 </button>
+               </>
             )}
             <button className="btn btn-secondary">Share Link</button>
           </div>

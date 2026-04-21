@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import AnimatedPage from '../components/AnimatedPage';
 import { Heart, MessageSquare, Share2, Image as ImageIcon, Code, Calendar } from 'lucide-react';
 
@@ -30,6 +30,7 @@ interface Comment {
 
 export default function Feed() {
   const { user } = useAuth();
+  const location = useLocation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState('');
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -57,6 +58,14 @@ export default function Feed() {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.openNewPost) {
+      setShowNewPostModal(true);
+      // Clean up state so it doesn't reopen on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleCreatePost = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

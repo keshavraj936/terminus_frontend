@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layers, Users, UtensilsCrossed, User, Bell, LogOut } from 'lucide-react';
+import { Layers, Users, UtensilsCrossed, User, Bell, LogOut, MessageSquare } from 'lucide-react';
 import api from '../services/api';
 
 interface Notification {
@@ -109,6 +109,10 @@ export default function Sidebar({ collapsed, setCollapsed }: { collapsed: boolea
           <span className="sidebar-icon"><UtensilsCrossed size={20} /></span>
           {!collapsed && <span>Mess Routine</span>}
         </Link>
+        <Link to="/chat" className={`sidebar-item hoverable ${location.pathname === '/chat' ? 'active' : ''}`}>
+          <span className="sidebar-icon"><MessageSquare size={20} /></span>
+          {!collapsed && <span>Messages</span>}
+        </Link>
         <Link to="/profile" className={`sidebar-item hoverable ${location.pathname === '/profile' ? 'active' : ''}`}>
           <span className="sidebar-icon"><User size={20} /></span>
           {!collapsed && <span>Profile</span>}
@@ -170,7 +174,13 @@ export default function Sidebar({ collapsed, setCollapsed }: { collapsed: boolea
           <button 
             className="btn hoverable" 
             style={{ width: '100%', background: 'var(--primary)', color: '#111', padding: '0.85rem', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, display: 'flex', justifyContent: 'center' }}
-            onClick={() => document.getElementById('global-new-post')?.click()}
+            onClick={() => {
+              if (location.pathname !== '/feed') {
+                navigate('/feed', { state: { openNewPost: true } });
+              } else {
+                document.getElementById('global-new-post')?.click();
+              }
+            }}
           >
             New Post
           </button>

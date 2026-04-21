@@ -11,7 +11,7 @@ export default function Signup() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -61,19 +61,32 @@ export default function Signup() {
             <div style={{ display: 'flex', gap: '1rem' }}>
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Dept</label>
-                <input type="text" name="department" className="input-field" placeholder="CS" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+                <select name="department" className="input-field" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} defaultValue="">
+                  <option value="" disabled>Select</option>
+                  <option value="CSE">CSE</option>
+                </select>
               </div>
               <div style={{ width: '100px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Year</label>
-                <input type="number" name="year" className="input-field" placeholder="1" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+                <select name="year" className="input-field" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} defaultValue="">
+                  <option value="" disabled>Select</option>
+                  <option value="2">2</option>
+                </select>
               </div>
               <div style={{ width: '100px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Batch</label>
-                <input type="text" name="batch" className="input-field" placeholder="2028" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+                <select name="batch" className="input-field" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} defaultValue="">
+                  <option value="" disabled>Select</option>
+                  <option value="2024">2024</option>
+                </select>
               </div>
               <div style={{ width: '100px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>Section</label>
-                <input type="text" name="section" className="input-field" placeholder="A" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} />
+                <select name="section" className="input-field" onChange={handleChange} required disabled={loading} style={{ height: '48px', background: 'var(--bg-color)', color: 'var(--text-main)' }} defaultValue="">
+                  <option value="" disabled>Select</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                </select>
               </div>
             </div>
 
